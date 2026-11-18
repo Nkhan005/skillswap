@@ -50,9 +50,48 @@ async function connectDB(uri = env.MONGO_URI) {
   }
 }
 
+/**
+ * Keep trying to connect, backing off between attempts, and never give up.
+ *
+ * The initial connection is the fragile one: Mongoose reconnects by itself
+ * once a connection has been established, but a failure at startup used to
+ * end the process. On a hosted platform that becomes a restart loop, and the
+ * site stays down even after the database returns - a paused Atlas cluster
+ * took SkillSwap offline exactly this way.
+ *
+ * Retrying instead lets the HTTP server start regardless, serve the client,
+ * report its state through /api/health, and pick the database up on its own
+ * whenever it comes back.
+ */
+function connectWithRetry(uri = env.MONGO_URI, { maxDelayMs = 30000 } = {}) {
+  let attempt = 0;
+
+  const attemptConnection = async () => {
+    for (;;) {
+      try {
+        return await connectDB(uri);
+      } catch (err) {
+        attempt += 1;
+        const delay = Math.min(1000 * 2 ** (attempt - 1), maxDelayMs);
+        logger.warn(
+          `MongoDB attempt ${attempt} failed (${err.message}). Retrying in ${delay / 1000}s; ` +
+            'the API is up and /api/health reports 503 until it connects.'
+        );
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+  };
+
+  // Not awaited by the caller: it resolves whenever the database becomes
+  // reachable. The catch is belt and braces - the loop itself cannot throw.
+  return attemptConnection().catch((err) =>
+    logger.error(`MongoDB retry loop stopped unexpectedly: ${err.message}`)
+  );
+}
+
 async function disconnectDB() {
   await mongoose.connection.close();
   logger.info('MongoDB connection closed');
 }
 
-module.exports = { connectDB, disconnectDB };
+module.exports = { connectDB, connectWithRetry, disconnectDB };
