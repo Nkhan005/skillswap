@@ -14,6 +14,7 @@ import Messages from './pages/Messages';
 import Wallet from './pages/Wallet';
 import Profile from './pages/Profile';
 import Challenges from './pages/Challenges';
+import Landing from './pages/Landing';
 
 /** Gate for signed-in routes; remembers where the user was headed. */
 function RequireAuth({ children }) {
@@ -42,6 +43,25 @@ function Shell({ children }) {
       <Toasts />
     </div>
   );
+}
+
+/**
+ * What the root URL means depends on who is asking.
+ *
+ * A signed-in member wants their dashboard. A first-time visitor needs to be
+ * told what the site is - sending them to /login, as this route used to,
+ * asked for a password for an account they do not have yet.
+ */
+function RootRoute() {
+  const { user, loading } = useAuth();
+
+  // Render nothing rather than a spinner: the session check resolves in a few
+  // milliseconds from a cached token, and a flashing spinner on the landing
+  // page is worse than a beat of nothing.
+  if (loading) return null;
+  if (user) return <Navigate to="/dashboard" replace />;
+
+  return <Landing />;
 }
 
 function AppRoutes() {
@@ -86,7 +106,7 @@ function AppRoutes() {
         />
       ))}
 
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/" element={<RootRoute />} />
       <Route
         path="*"
         element={
