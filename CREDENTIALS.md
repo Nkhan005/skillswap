@@ -35,7 +35,7 @@ half an hour you need not spend.
 | SonarQube analysis token | — | `.env.ci` → `SONAR_TOKEN` | Lets Jenkins submit analyses |
 | **Docker Hub** | `nyamatullakhan` | `.env.ci` → `DOCKERHUB_TOKEN` | Pushing images from Jenkins |
 | **MongoDB Atlas** | `Nayeem_Khan` | Render → `MONGO_URI` | The live database |
-| **GitHub** | `NKhan005` | Your machine's git credential store | Pushing code |
+| **GitHub** | `Nkhan005` | Your machine's git credential store | Pushing code |
 | **Render** | your login | Render's own account | The live site |
 
 The Jenkins and SonarQube passwords were generated for this project and exist
