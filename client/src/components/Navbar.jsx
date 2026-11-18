@@ -13,6 +13,7 @@ import {
   User as UserIcon,
   Menu,
   X,
+  MapPin,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
@@ -21,6 +22,7 @@ import { Avatar, TrustBadge } from './ui';
 const LINKS = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/explore', label: 'Explore', icon: Search },
+  { to: '/nearby', label: 'Nearby', icon: MapPin },
   { to: '/swaps', label: 'Swaps', icon: Repeat },
   { to: '/messages', label: 'Messages', icon: MessageSquare },
   { to: '/wallet', label: 'Wallet', icon: Coins },

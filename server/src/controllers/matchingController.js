@@ -2,6 +2,7 @@
 
 const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
+const { publicLocation } = require('../utils/privacy');
 const { findDirectMatches, findNearbyMatches, RADIUS_PRESETS_KM } = require('../utils/matching');
 
 /** GET /api/matching - feature 2, smart direct matching. */
@@ -72,7 +73,9 @@ const explore = asyncHandler(async (req, res) => {
     .limit(Math.min(parseInt(limit || '40', 10), 100))
     .lean();
 
-  res.json({ success: true, count: users.length, users });
+  // Same blur as the matching endpoints: browsing the directory must not
+  // be a way around the protection applied to matches.
+  res.json({ success: true, count: users.length, users: users.map(publicLocation) });
 });
 
 /** GET /api/matching/skills - distinct skill names, for filter dropdowns. */

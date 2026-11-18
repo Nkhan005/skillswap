@@ -120,6 +120,17 @@ const userSchema = new mongoose.Schema(
     bio: { type: String, trim: true, maxlength: 600, default: '' },
     city: { type: String, trim: true, default: '' },
 
+    // How precisely this member is willing to be shown on the map. The stored
+    // point is always exact - this only controls what the API publishes.
+    //   area   ~450m blur, close enough to judge travel, too coarse to locate
+    //   city   ~8km blur, the right town and nothing more
+    //   hidden no coordinates published at all
+    locationPrecision: {
+      type: String,
+      enum: ['area', 'city', 'hidden'],
+      default: 'area',
+    },
+
     // Feature 3 - GeoJSON point driving $near radius matching.
     location: {
       type: { type: String, enum: ['Point'], default: 'Point' },
@@ -209,7 +220,11 @@ userSchema.methods.toPublicProfile = function toPublicProfile() {
   delete obj.password;
   delete obj.email;
   delete obj.__v;
-  return obj;
+
+  // Required lazily: privacy.js reads config/env, and importing it at module
+  // scope would tie model loading to config loading for no benefit.
+  const { publicLocation } = require('../utils/privacy');
+  return publicLocation(obj);
 };
 
 const User = mongoose.model('User', userSchema);

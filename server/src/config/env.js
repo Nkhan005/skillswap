@@ -31,6 +31,13 @@ const env = {
   PORT: parseInt(process.env.PORT || '5000', 10),
   MONGO_URI: required('MONGO_URI', 'mongodb://127.0.0.1:27017/skillswap'),
   JWT_SECRET: required('JWT_SECRET', 'skillswap_dev_secret_change_me'),
+
+  // Salt for the deterministic location blur (utils/privacy.js). It falls
+  // back to JWT_SECRET so an existing deployment keeps working without a new
+  // variable - the two are never used in the same place, and what matters is
+  // only that this value is secret and stable. Changing it moves every
+  // member's approximate pin, which is harmless but visible.
+  LOCATION_SALT: process.env.LOCATION_SALT || required('JWT_SECRET', 'skillswap_dev_secret_change_me'),
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
   // Accepts a comma-separated list, and tolerates a bare hostname. Render's
   // `fromService: property: host` yields "skillswap-hryf" with no scheme,

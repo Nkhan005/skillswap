@@ -110,3 +110,67 @@
     animation: none;
   }
 }
+
+/* --- Map markers ---------------------------------------------------------
+   MapLibre markers are plain DOM elements, so they are styled here rather
+   than with Tailwind classes: the elements are created imperatively in
+   NearbyMap.jsx and Tailwind cannot see those strings to generate utilities
+   for them. */
+
+.ss-map-pin {
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  border: 2px solid rgb(255 255 255 / 0.9);
+  background: color-mix(in srgb, var(--color-brand-500) 55%, transparent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-brand-500) 14%, transparent);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ss-map-pin:hover,
+.ss-map-pin:focus-visible {
+  transform: scale(1.12);
+  box-shadow: 0 0 0 10px color-mix(in srgb, var(--color-brand-500) 18%, transparent);
+}
+
+/* Mutual matches are the whole point of the platform, so they get the
+   accent colour rather than being one more indigo dot. */
+.ss-map-pin.is-mutual {
+  background: color-mix(in srgb, var(--color-mint-500) 60%, transparent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-mint-500) 16%, transparent);
+}
+
+.ss-map-self {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: #0f172a;
+  border: 3px solid #fff;
+  box-shadow: 0 1px 6px rgb(15 23 42 / 0.4);
+}
+
+.ss-popup {
+  min-width: 180px;
+  font-family: var(--font-sans);
+}
+.ss-popup-name {
+  font-weight: 600;
+  color: #0f172a;
+}
+.ss-popup-meta {
+  font-size: 0.8rem;
+  color: #475569;
+  margin-top: 2px;
+}
+.ss-popup-skills {
+  font-size: 0.8rem;
+  color: #334155;
+  margin-top: 6px;
+}
+.ss-popup-note {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-top: 8px;
+  font-style: italic;
+}

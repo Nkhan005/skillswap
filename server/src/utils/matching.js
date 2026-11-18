@@ -1,6 +1,7 @@
 'use strict';
 
 const mongoose = require('mongoose');
+const { publicLocation } = require('./privacy');
 
 /**
  * Features 2 and 3 - matching engine.
@@ -64,9 +65,14 @@ function buildMatch(viewerSets, candidate, distanceKm) {
 
   if (theyTeachMe.length === 0 && iTeachThem.length === 0) return null;
 
-  const plain = typeof candidate.toObject === 'function' ? candidate.toObject() : candidate;
-  delete plain.password;
-  delete plain.email;
+  const raw = typeof candidate.toObject === 'function' ? candidate.toObject() : candidate;
+  delete raw.password;
+  delete raw.email;
+
+  // Blur the point before it leaves the server. Distances above are still
+  // computed from the true coordinates, so the distance shown stays honest
+  // while the published position does not identify an address.
+  const plain = publicLocation(raw);
 
   return {
     user: plain,
@@ -185,7 +191,7 @@ async function findNearbyMatches(viewer, opts = {}) {
         const m = buildMatch(sets, c, distanceKm);
         if (m) return m;
         return {
-          user: c,
+          user: publicLocation(c),
           matchType: 'nearby',
           theyTeachMe: [],
           iTeachThem: [],

@@ -15,6 +15,7 @@ import Wallet from './pages/Wallet';
 import Profile from './pages/Profile';
 import Challenges from './pages/Challenges';
 import Landing from './pages/Landing';
+import Nearby from './pages/Nearby';
 
 /** Gate for signed-in routes; remembers where the user was headed. */
 function RequireAuth({ children }) {
@@ -87,6 +88,7 @@ function AppRoutes() {
       {[
         ['/dashboard', <Dashboard key="d" />],
         ['/explore', <Explore key="e" />],
+        ['/nearby', <Nearby key="n" />],
         ['/swaps', <Swaps key="s" />],
         ['/messages', <Messages key="m" />],
         ['/messages/:swapId', <Messages key="mt" />],

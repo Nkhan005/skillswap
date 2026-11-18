@@ -21,6 +21,14 @@ export default defineConfig({
       },
     },
   },
+  // maplibre-gl spawns a Web Worker to parse vector tiles off the main
+  // thread. Vite's dependency pre-bundler rewrites module URLs, which breaks
+  // the worker's own URL resolution - the map then renders grey tiles and
+  // logs "Worker failed to load". Excluding it means Vite serves the
+  // package's own ESM build untouched, worker included.
+  optimizeDeps: {
+    exclude: ['maplibre-gl'],
+  },
   build: {
     outDir: 'dist',
     sourcemap: false,
