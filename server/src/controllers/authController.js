@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
+const { resolveSkillName } = require('../data/skillCatalog');
 const { signToken } = require('../middleware/auth');
 const env = require('../config/env');
 
@@ -131,6 +132,19 @@ const updateMe = asyncHandler(async (req, res) => {
   }
   for (const field of ARRAY_FIELDS) {
     if (Array.isArray(body[field])) user[field] = body[field];
+  }
+
+  // Canonicalise skill names on the way in. Doing it here rather than in the
+  // UI means the rule holds for every client - the web app, a future mobile
+  // app, or someone posting to the API directly - and the database never
+  // accumulates a second spelling of a skill it already knows.
+  for (const field of ['skillsOffered', 'skillsNeeded']) {
+    if (!Array.isArray(user[field])) continue;
+    user[field] = user[field].map((skill) => {
+      const resolved = resolveSkillName(skill?.name);
+      if (!resolved) return skill;
+      return { ...skill, name: resolved.name, category: resolved.category };
+    });
   }
   if (body.isAvailable !== undefined) user.isAvailable = Boolean(body.isAvailable);
 

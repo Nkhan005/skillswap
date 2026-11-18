@@ -3,6 +3,7 @@
 const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
 const { publicLocation } = require('../utils/privacy');
+const { catalogByCategory } = require('../data/skillCatalog');
 const { findDirectMatches, findNearbyMatches, RADIUS_PRESETS_KM } = require('../utils/matching');
 
 /** GET /api/matching - feature 2, smart direct matching. */
@@ -94,7 +95,17 @@ const getSkillCatalog = asyncHandler(async (_req, res) => {
     { $project: { _id: 0, name: '$_id', category: 1, teachers: 1 } },
   ]);
 
-  res.json({ success: true, skills: offered, categories: User.SKILL_CATEGORIES });
+  // Two different things, both useful to the picker:
+  //   catalog  - the curated taxonomy, so the options are the same for
+  //              everyone and do not depend on who has signed up yet
+  //   skills   - what members actually offer right now, with counts, so the
+  //              UI can surface popular choices first
+  res.json({
+    success: true,
+    catalog: catalogByCategory(),
+    skills: offered,
+    categories: User.SKILL_CATEGORIES,
+  });
 });
 
 module.exports = { getDirectMatches, getNearbyMatches, explore, getSkillCatalog };
